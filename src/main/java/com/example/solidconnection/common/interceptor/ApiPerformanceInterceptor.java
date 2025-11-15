@@ -63,6 +63,39 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
 
         String originalUri = extractOriginalUri(request);
         String logUri = normalizeRoutePath(request, originalUri);
+        int status = response.getStatus();
+
+        if(status >= 500){
+            API_PERF.error("type=API_Error method_type={} uri={} status={}",
+                           request.getMethod(),
+                           logUri,
+                           status
+            );
+
+            log.error("[API Error]: {} {} [Status: {}]",
+                      request.getMethod(),
+                      originalUri,
+                      status
+            );
+
+            return;
+        }
+
+        if(status >= 400){
+            API_PERF.warn("type=API_Error method_type={} uri={} status={}",
+                          request.getMethod(),
+                          logUri,
+                          status
+            );
+
+            log.warn("[API Error]: {} {} [Status: {}]",
+                     request.getMethod(),
+                     originalUri,
+                     status
+            );
+
+            return;
+        }
 
         if (responseTime > RESPONSE_TIME_THRESHOLD) {
             API_PERF.warn(

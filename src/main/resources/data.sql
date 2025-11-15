@@ -41,7 +41,7 @@ VALUES ('BN', '브루나이', 'ASIA'),
        ('MY', '말레이시아', 'ASIA'),
        ('RU', '러시아', 'EUROPE');
 
-INSERT INTO term (name, is_current) VALUES ('2024-1', true);
+--INSERT INTO term (name, is_current) VALUES ('2024-1', true);
 
 INSERT INTO site_user (email, nickname, profile_image_url, exchange_status, role, password, auth_type)
 VALUES ('test@test.email', 'yonso', 'https://github.com/nayonsoso.png',

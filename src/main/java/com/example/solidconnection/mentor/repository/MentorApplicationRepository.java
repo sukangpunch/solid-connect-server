@@ -11,5 +11,7 @@ public interface MentorApplicationRepository extends JpaRepository<MentorApplica
 
     boolean existsBySiteUserIdAndMentorApplicationStatusIn(long siteUserId, List<MentorApplicationStatus> mentorApplicationStatuses);
 
+    long countByMentorApplicationStatus(MentorApplicationStatus mentorApplicationStatus);
+
     Optional<MentorApplication> findBySiteUserIdAndMentorApplicationStatus(long siteUserId, MentorApplicationStatus mentorApplicationStatus);
 }

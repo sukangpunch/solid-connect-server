@@ -5,6 +5,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPL
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
+import com.example.solidconnection.admin.dto.MentorApplicationCountResponse;
 import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
@@ -292,6 +293,40 @@ class AdminMentorApplicationServiceTest {
             assertThatCode(() -> adminMentorApplicationService.rejectMentorApplication(nonExistentId, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MENTOR_APPLICATION_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    class 멘토_지원서_상태별_개수_조회 {
+
+        @Test
+        void 상태별_멘토_지원서_개수를_조회한다() {
+            // given
+            List<MentorApplication> expectedApprovedCount = List.of(mentorApplication1, mentorApplication4);
+            List<MentorApplication> expectedPendingCount = List.of(mentorApplication2, mentorApplication5);
+            List<MentorApplication> expectedRejectedCount = List.of(mentorApplication3, mentorApplication6);
+
+            // when
+            MentorApplicationCountResponse response = adminMentorApplicationService.getMentorApplicationCount();
+
+            // then
+            assertThat(response.approved()).isEqualTo(expectedApprovedCount.size());
+            assertThat(response.pending()).isEqualTo(expectedPendingCount.size());
+            assertThat(response.rejected()).isEqualTo(expectedRejectedCount.size());
+        }
+
+        @Test
+        void 멘토_지원서가_없으면_모든_개수가_0이다() {
+            // given
+            mentorApplicationRepository.deleteAll();
+
+            // when
+            MentorApplicationCountResponse response = adminMentorApplicationService.getMentorApplicationCount();
+
+            // then
+            assertThat(response.approved()).isEqualTo(0L);
+            assertThat(response.pending()).isEqualTo(0L);
+            assertThat(response.rejected()).isEqualTo(0L);
         }
     }
 }

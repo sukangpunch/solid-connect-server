@@ -13,9 +13,11 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import java.net.PasswordAuthentication;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import javax.crypto.SecretKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -115,28 +117,32 @@ class TokenAuthenticationProviderTest {
 
     private String createValidToken(long id) {
         return Jwts.builder()
-                .setSubject(String.valueOf(id))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000))
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
+                .subject(String.valueOf(id))
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000))
+                .signWith(getSigningKey())
                 .compact();
     }
 
     private String createExpiredToken() {
         return Jwts.builder()
-                .setSubject(String.valueOf(user.getId()))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() - 1000))
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
+                .subject(String.valueOf(user.getId()))
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() - 1000))
+                .signWith(getSigningKey())
                 .compact();
     }
 
     private String createWrongSubjectTypeToken() {
         return Jwts.builder()
-                .setSubject("subject")
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000))
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
+                .subject("subject")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000))
+                .signWith(getSigningKey())
                 .compact();
+    }
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8));
     }
 }
